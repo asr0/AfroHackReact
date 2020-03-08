@@ -18,6 +18,7 @@ namespace AfroHackReact.Model
         public int CodigoUsuario { get; set; }
         public string ExperienciaVida { get; set; }
         public int CodigoAreaInteresse { get; set; }
+        public string EnderecoLinkedin { get; set; }
         public List<HorarioUsuarioMentor> ListaHorarios { get; set; }
     }
 }

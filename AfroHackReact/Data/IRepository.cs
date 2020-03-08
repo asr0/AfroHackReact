@@ -8,6 +8,7 @@ namespace AfroHackReact
 {
     public interface IRepository
     {
+        List<AreaInteresse> AreasInteresse();
         void CriarUsuario(Usuario usuario);
         List<HorarioUsuarioMentor> HorariosDisponiveis();
         List<Usuario> ListarMentores(int CodigoUsuario);

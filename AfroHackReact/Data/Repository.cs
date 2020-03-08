@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace AfroHackReact.Data
 {
@@ -27,38 +26,11 @@ namespace AfroHackReact.Data
             usuario.Ativo = true;
             usuario.DataCriacao = DateTime.Now;
 
-            var sql = @" INSERT INTO USUARIO(
-                            [NomeUsuario]
-                           ,[CodigoTipoUsuario]
-                           ,[Email]
-                           ,[NumeroCelular]
-                           ,[Senha]
-                           ,[Ativo]
-                           ,[DataNascimento]
-                           ,[NumeroDocumento]
-                           ,[ExperienciaVida]
-                           ,[CodigoAreaInteresse]
-                           ,[DataCriacao])
-                            VALUES(
-                                @NomeUsuario,
-                                @CodigoTipoUsuario,
-                                @Email,
-                                @NumeroCelular,
-                                @Senha,
-                                @Ativo,
-                                @DataNascimento,
-                                @NumeroDocumento,
-                                @ExperienciaVida,
-                                @CodigoAreaInteresse,
-                                @DataCriacao)
-                            SELECT CAST(SCOPE_IDENTITY() as int)";
-
-            var id = conexao.Query<int>(sql, usuario).Single();
+            var id = conexao.Query<int>(Sql.CriarUsuario, usuario).Single();
 
             foreach (var item in usuario.ListaHorarios)
             {
-                string sql2 = "INSERT INTO HorarioUsuarioMentor (CodigoUsuarioMentor, CodigoHorarioDisponivel, Ativo) VALUES (@Id, @CodigoHorarioDisponivel,1)";
-                conexao.Execute(sql2, new { Id = id, item.CodigoHorarioDisponivel });
+                conexao.Execute(Sql.CriarUsuarioHorario, new { Id = id, item.CodigoHorarioDisponivel });
             }
 
             conexao.Close();
@@ -67,34 +39,17 @@ namespace AfroHackReact.Data
         public Usuario Login(string Email, string Senha)
         {
             using SqlConnection conexao = new SqlConnection(connectionString);
+
             conexao.Open();
 
-            var sql = @"SELECT
-                       [CodigoUsuario]
-                      ,[NomeUsuario]
-                      ,[CodigoTipoUsuario]
-                      ,[Email]
-                      ,[NumeroCelular]
-                      ,[Senha]
-                      ,[Ativo]
-                      ,[DataNascimento]
-                      ,[NumeroDocumento]
-                      ,[DataCriacao]
-                      ,[DataAlteracao]
-                        FROM USUARIO WHERE EMAIL = @Email AND SENHA = @Senha";
-
-            var retorno = conexao.Query<Usuario>(sql, new { Email, Senha }).FirstOrDefault();
-
-            var sql2 = @"SELECT * FROM HorarioUsuarioMentor
-                        JOIN HorarioDisponivel ON HorarioDisponivel.CodigoHorarioDisponivel = HorarioUsuarioMentor.CodigoHorarioDisponivel WHERE CodigoUsuarioMentor = @CodigoUsuario";
+            var retorno = conexao.Query<Usuario>(Sql.LoginUsuario, new { Email, Senha }).FirstOrDefault();
 
             if (retorno != null)
             {
-                retorno.ListaHorarios = conexao.Query<HorarioUsuarioMentor>(sql2, new { retorno.CodigoUsuario }).ToList();
+                retorno.ListaHorarios = conexao.Query<HorarioUsuarioMentor>(Sql.LoginHorarios, new { retorno.CodigoUsuario }).ToList();
             }
 
             conexao.Close();
-
             return retorno;
         }
 
@@ -103,22 +58,20 @@ namespace AfroHackReact.Data
             using SqlConnection conexao = new SqlConnection(connectionString);
             conexao.Open();
 
-            var sql = @"(
-                        SELECT * FROM USUARIO
-                        JOIN HorarioUsuarioMentor ON HorarioUsuarioMentor.CodigoUsuarioMentor = USUARIO.CodigoUsuario
-                        WHERE
-                        CodigoTipoUsuario = 1
-                        AND HorarioUsuarioMentor.CodigoHorarioDisponivel IN
-                        (
-	                        SELECT CodigoHorarioDisponivel FROM HorarioUsuarioMentor WHERE CodigoUsuarioMentor = @CodigoUsuario
-                        )
+            var retorno = conexao.Query<Usuario>(Sql.ListaMentores, new { CodigoUsuario }).ToList();
 
-                        AND USUARIO.codigoareainteresse IN
-                        (
-	                        SELECT codigoareainteresse FROM USUARIO WHERE CodigoUsuario = @CodigoUsuario
-                        ))";
+            conexao.Close();
 
-            var retorno = conexao.Query<Usuario>(sql, new { CodigoUsuario }).ToList();
+            return retorno;
+        }
+
+        public List<AreaInteresse> AreasInteresse()
+        {
+            using SqlConnection conexao = new SqlConnection(connectionString);
+
+            conexao.Open();
+
+            var retorno = conexao.Query<AreaInteresse>(Sql.AreasInteresse).ToList();
 
             conexao.Close();
 
@@ -128,16 +81,12 @@ namespace AfroHackReact.Data
         public List<HorarioUsuarioMentor> HorariosDisponiveis()
         {
             using SqlConnection conexao = new SqlConnection(connectionString);
+
             conexao.Open();
 
-            var sql = @"SELECT [CodigoHorarioDisponivel]
-                      ,[DescricaoPeriodo]
-                      ,[DescricaoHorario]
-                      ,[DataInclusao]
-                  FROM [dbo].[HorarioDisponivel]";
+            var retorno = conexao.Query<HorarioUsuarioMentor>(Sql.HorariosDisponiveis).ToList();
 
-            var retorno = conexao.Query<HorarioUsuarioMentor>(sql).ToList();
-
+            conexao.Close();
             return retorno;
         }
     }

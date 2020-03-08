@@ -117,7 +117,83 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AreasInteresse" xml:space="preserve">
+    <value>SELECT [CodigoAreaInteresse]
+                      ,[DescricaoAreaInterese]
+                      ,[Ativo]
+                      ,[DataCadastro]
+                    FROM [dbo].[AreaInteresse]</value>
+  </data>
   <data name="CriarUsuario" xml:space="preserve">
-    <value />
+    <value>INSERT INTO USUARIO(
+                            [NomeUsuario]
+                           ,[CodigoTipoUsuario]
+                           ,[Email]
+                           ,[NumeroCelular]
+                           ,[Senha]
+                           ,[Ativo]
+                           ,[DataNascimento]
+                           ,[NumeroDocumento]
+                           ,[ExperienciaVida]
+                           ,[CodigoAreaInteresse]
+                           ,[DataCriacao])
+                            VALUES(
+                                @NomeUsuario,
+                                @CodigoTipoUsuario,
+                                @Email,
+                                @NumeroCelular,
+                                @Senha,
+                                @Ativo,
+                                @DataNascimento,
+                                @NumeroDocumento,
+                                @ExperienciaVida,
+                                @CodigoAreaInteresse,
+                                @DataCriacao)
+                            SELECT CAST(SCOPE_IDENTITY() as int)</value>
+  </data>
+  <data name="CriarUsuarioHorario" xml:space="preserve">
+    <value>INSERT INTO HorarioUsuarioMentor (CodigoUsuarioMentor, CodigoHorarioDisponivel, Ativo) VALUES (@Id, @CodigoHorarioDisponivel,1)</value>
+  </data>
+  <data name="HorariosDisponiveis" xml:space="preserve">
+    <value>SELECT [CodigoHorarioDisponivel]
+                      ,[DescricaoPeriodo]
+                      ,[DescricaoHorario]
+                      ,[DataInclusao]
+                  FROM [dbo].[HorarioDisponivel]</value>
+  </data>
+  <data name="ListaMentores" xml:space="preserve">
+    <value>(
+                        SELECT * FROM USUARIO
+                        JOIN HorarioUsuarioMentor ON HorarioUsuarioMentor.CodigoUsuarioMentor = USUARIO.CodigoUsuario
+                        WHERE
+                        CodigoTipoUsuario = 1
+                        AND HorarioUsuarioMentor.CodigoHorarioDisponivel IN
+                        (
+	                        SELECT CodigoHorarioDisponivel FROM HorarioUsuarioMentor WHERE CodigoUsuarioMentor = @CodigoUsuario
+                        )
+
+                        AND USUARIO.codigoareainteresse IN
+                        (
+	                        SELECT codigoareainteresse FROM USUARIO WHERE CodigoUsuario = @CodigoUsuario
+                        ))</value>
+  </data>
+  <data name="LoginHorarios" xml:space="preserve">
+    <value>SELECT * FROM HorarioUsuarioMentor
+                        JOIN HorarioDisponivel ON HorarioDisponivel.CodigoHorarioDisponivel = HorarioUsuarioMentor.CodigoHorarioDisponivel WHERE CodigoUsuarioMentor = @CodigoUsuario</value>
+  </data>
+  <data name="LoginUsuario" xml:space="preserve">
+    <value>SELECT
+                       [CodigoUsuario]
+                      ,[NomeUsuario]
+                      ,[CodigoTipoUsuario]
+                      ,[Email]
+                      ,[NumeroCelular]
+                      ,[Senha]
+                      ,[Ativo]
+                      ,[DataNascimento]
+                      ,[NumeroDocumento]
+                      ,[DataCriacao]
+                      ,[DataAlteracao]
+                        FROM USUARIO WHERE EMAIL = @Email AND SENHA = @Senha</value>
   </data>
 </root>

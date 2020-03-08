@@ -88,5 +88,17 @@ namespace AfroHackReact.Controllers
                 return Ok(horarios);
             }
         }
+
+        [HttpGet("AreasInteresse")]
+        public IActionResult AreasInteresse()
+        {
+            var retorno = _repository.AreasInteresse();
+
+            if (retorno == null)
+            {
+                return NoContent();
+            }
+            return Ok(retorno);
+        }
     }
 }
