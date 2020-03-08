@@ -73,5 +73,20 @@ namespace AfroHackReact.Controllers
 
             return Ok(listaMentores);
         }
+
+        [HttpGet("HorariosDisponiveis")]
+        public IActionResult HorariosDisponiveis()
+        {
+            var horarios = _repository.HorariosDisponiveis();
+
+            if (horarios == null)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return Ok(horarios);
+            }
+        }
     }
 }

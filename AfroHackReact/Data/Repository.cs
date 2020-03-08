@@ -124,5 +124,21 @@ namespace AfroHackReact.Data
 
             return retorno;
         }
+
+        public List<HorarioUsuarioMentor> HorariosDisponiveis()
+        {
+            using SqlConnection conexao = new SqlConnection(connectionString);
+            conexao.Open();
+
+            var sql = @"SELECT [CodigoHorarioDisponivel]
+                      ,[DescricaoPeriodo]
+                      ,[DescricaoHorario]
+                      ,[DataInclusao]
+                  FROM [dbo].[HorarioDisponivel]";
+
+            var retorno = conexao.Query<HorarioUsuarioMentor>(sql).ToList();
+
+            return retorno;
+        }
     }
 }
