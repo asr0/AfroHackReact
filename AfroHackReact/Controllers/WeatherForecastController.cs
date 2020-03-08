@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AfroHackReact.Controllers
 {
@@ -17,10 +18,16 @@ namespace AfroHackReact.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IConfiguration configuration;
+        private string connectionString;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration config)
         {
             _logger = logger;
+
+            configuration = config;
+            connectionString = configuration.GetConnectionString("DefaultConnection");
+            //Server = tcp:react - afrodbserver.database.windows.net,1433; Initial Catalog = react - afro_db; Persist Security Info = False; User ID = afro; Password ={ your_password}; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30;
         }
 
         [HttpGet]
